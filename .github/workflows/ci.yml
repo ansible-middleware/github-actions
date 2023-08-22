@@ -66,14 +66,20 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.8", "3.9", "3.11"]
-        ansible_version: ["2.11", "2.15"]
+        ansible_version: ["stable-2.9", "stable-2.11", "stable-2.15", "devel"]
         exclude:
           - python_version: "3.8"
-            ansible_version: "2.15"
+            ansible_version: "stable-2.15"
           - python_version: "3.9"
-            ansible_version: "2.15"
+            ansible_version: "stable-2.15"
+          - python_version: "3.8"
+            ansible_version: "devel"
+          - python_version: "3.9"
+            ansible_version: "devel"
           - python_version: "3.11"
-            ansible_version: "2.11"
+            ansible_version: "stable-2.9"
+          - python_version: "3.11"
+            ansible_version: "stable-2.11"
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -96,7 +102,7 @@ jobs:
           pip install https://github.com/ansible/ansible/archive/stable-${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
-        run: ansible-test sanity -v --color --docker --python ${{ matrix.python_version }} --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
+        run: ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
