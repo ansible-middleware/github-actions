@@ -9,6 +9,15 @@ on:
       molecule_tests:
         required: true
         type: string
+    secrets:
+      clientid_prod:
+        required: false
+      clientsecret_prod:
+        required: false
+      clientid_staging:
+        required: false
+      clientsecret_staging:
+        required: false
 
 env:
   COLORTERM: 'yes'
@@ -16,10 +25,6 @@ env:
   PYTEST_ADDOPTS: '--color=yes'
   PY_COLORS: '1'
   ANSIBLE_FORCE_COLOR: '1'
-  PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
-  PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
-  STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
-  STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
 
 jobs:
   linter:
@@ -128,7 +133,7 @@ jobs:
           path: ansible_collections/${{ inputs.fqcn }}
 
       - name: Use a repo or org secret from the calling workflow.
-        run: echo $PROD_JBOSSNETWORK_API_CLIENTID
+        run: echo ${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
@@ -155,3 +160,9 @@ jobs:
           molecule --version
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
+        env:
+          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.clientid_prod }}'
+          PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.clientsecret_prod }}'
+          STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.clientid_staging }}'
+          STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.clientsecret_staging }}'
+
