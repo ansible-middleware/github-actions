@@ -9,6 +9,15 @@ on:
       molecule_tests:
         required: true
         type: string
+    secrets:
+      clientid_prod:
+        required: false
+      clientsecret_prod:
+        required: false
+      clientid_staging:
+        required: false
+      clientsecret_staging:
+        required: false
 
 env:
   COLORTERM: 'yes'
@@ -152,8 +161,8 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
-          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
-          PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
-          STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
-          STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
+          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.clientid_prod }}'
+          PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.clientsecret_prod }}'
+          STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.clientid_staging }}'
+          STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.clientsecret_staging }}'
 
