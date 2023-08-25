@@ -11,13 +11,13 @@ on:
         type: string
     secrets:
       clientid_prod:
-        required: false
+        required: true
       clientsecret_prod:
-        required: false
+        required: true
       clientid_staging:
-        required: false
+        required: true
       clientsecret_staging:
-        required: false
+        required: true
 
 env:
   COLORTERM: 'yes'
@@ -133,7 +133,7 @@ jobs:
           path: ansible_collections/${{ inputs.fqcn }}
 
       - name: Use a repo or org secret from the calling workflow.
-        run: echo ${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}
+        run: echo ${{ secrets.clientid_prod }}
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
