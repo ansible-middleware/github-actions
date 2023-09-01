@@ -67,3 +67,5 @@ jobs:
           generate_docs: true
           path: ansible_collections/${{ inputs.fqcn }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          bot_email: ansible-middleware-core@redhat.com
+          bot_account: ansible-middleware-core

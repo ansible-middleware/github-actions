@@ -69,6 +69,8 @@ jobs:
           changelog_release: true
           generate_docs: false
           token: ${{ secrets.GITHUB_TOKEN }}
+          bot_email: ansible-middleware-core@redhat.com
+          bot_account: ansible-middleware-core
 
       - name: Publish collection
         env:
@@ -78,8 +80,8 @@ jobs:
 
       - name: Create release tag
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
           git tag -a ${{ steps.get_version.outputs.TAG_VERSION }} -m "Release v${{ steps.get_version.outputs.TAG_VERSION }}" || true
           git push origin --tags
 
@@ -101,8 +103,8 @@ jobs:
           TAG_VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
           NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
           git checkout main || true
           git pull || true
           sed -i -e "s#version: \"$TAG_VERSION\"#version: \"$NEXT_VERSION\"#" galaxy.yml
