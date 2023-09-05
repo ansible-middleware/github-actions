@@ -104,7 +104,8 @@ jobs:
 
       - name: Install ansible-core ${{ matrix.ansible_version }}
         run: |
-          pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
+          curl -o ${{ matrix.ansible_version }}.tar.gz https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz
+          pip install ${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
