@@ -6,6 +6,9 @@ on:
       collection_fqcn:
         required: true
         type: string
+    secrets:
+      galaxy_token:
+        required: true
 
 jobs:
   release:
@@ -73,7 +76,7 @@ jobs:
 
       - name: Publish collection
         env:
-          ANSIBLE_GALAXY_API_KEY: ${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+          ANSIBLE_GALAXY_API_KEY: ${{ secrets.galaxy_token }}
         run: |
           ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_API_KEY
 
