@@ -113,9 +113,9 @@ jobs:
           sudo add-apt-repository universe
           sudo apt update
           sudo apt install -y python2
-          curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py
+          curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
           sudo python2 get-pip.py
-          sudo apt install virtualenv
+          sudo apt install -y virtualenv
           virtualenv -p python2 /home/runner/virtualenv/2.11
           source /home/runner/virtualenv/2.11/bin/activate
           pip install ansible-core==2.11
