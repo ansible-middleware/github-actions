@@ -68,9 +68,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.11"]
+        python_version: ["2.7", "3.8", "3.9", "3.11"]
         ansible_version: ["stable-2.9", "stable-2.11", "stable-2.15", "devel"]
         exclude:
+          - python_version: "2.7"
+            ansible_version: "stable-2.15"
+          - python_version: "2.7"
+            ansible_version: "devel"
           - python_version: "3.8"
             ansible_version: "stable-2.15"
           - python_version: "3.8"
@@ -91,16 +95,30 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python_version }}
-          cache: 'pip'
-
       - name: Create default collection path
         run: |
           mkdir -p /home/runner/.ansible/
           ln -s ${{ github.workspace }} /home/runner/.ansible/collections
+
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v4
+        if: matrix.python_version != "2.7"
+        with:
+          python-version: ${{ matrix.python_version }}
+          cache: "pip"
+
+      - name: Set up Python ${{ matrix.python_version }} virtualenv
+        if: matrix.python_version == "2.7"
+        run: |
+          sudo add-apt-repository universe
+          sudo apt update
+          sudo apt install -y python2
+          curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py
+          sudo python2 get-pip.py
+          sudo apt install virtualenv
+          virtualenv -p python2 /home/runner/virtualenv/2.11
+          source /home/runner/virtualenv/2.11/bin/activate
+          pip install ansible-core==2.11
 
       - name: Install ansible-core ${{ matrix.ansible_version }}
         run: |
@@ -108,7 +126,9 @@ jobs:
           pip install ${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
-        run: ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
+        run: |
+          python -V
+          ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
