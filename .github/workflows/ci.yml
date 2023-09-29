@@ -102,13 +102,13 @@ jobs:
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
-        if: matrix.python_version != "2.7"
+        if: matrix.python_version != '2.7'
         with:
           python-version: ${{ matrix.python_version }}
           cache: "pip"
 
       - name: Set up Python ${{ matrix.python_version }} virtualenv
-        if: matrix.python_version == "2.7"
+        if: matrix.python_version == '2.7'
         run: |
           sudo add-apt-repository universe
           sudo apt update
