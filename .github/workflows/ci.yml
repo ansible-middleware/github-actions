@@ -89,6 +89,8 @@ jobs:
             ansible_version: "devel"
           - python_version: "3.11"
             ansible_version: "stable-2.9"
+          - python_version: "3.11"
+            ansible_version: "stable-2.13"
     steps:
       - name: Check out code
         uses: actions/checkout@v3
