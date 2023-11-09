@@ -9,7 +9,68 @@ on:
       molecule_tests:
         required: true
         type: string
-
+      sanity_excludes:
+        required: false
+        type: string
+        default: >-
+          [
+            {
+              "python_version": "2.7"
+              "ansible_version": "stable-2.11"
+            },
+            {
+              "python_version": "2.7"
+              "ansible_version": "stable-2.14"
+            },
+            {
+              "python_version": "2.7"
+              "ansible_version": "milestone"
+            },
+            {
+              "python_version": "2.7"
+              "ansible_version": "devel"
+            },
+            {
+              "python_version": "3.8"
+              "ansible_version": "stable-2.14"
+            },
+            {
+              "python_version": "3.8"
+              "ansible_version": "milestone"
+            },
+            {
+              "python_version": "3.8"
+              "ansible_version": "devel"
+            },
+            {
+              "python_version": "3.9"
+              "ansible_version": "stable-2.9"
+            },
+            {
+              "python_version": "3.9"
+              "ansible_version": "stable-2.11"
+            },
+            {
+              "python_version": "3.9"
+              "ansible_version": "stable-2.14"
+            },
+            {
+              "python_version": "3.9"
+              "ansible_version": "milestone"
+            },
+            {
+              "python_version": "3.9"
+              "ansible_version": "devel"
+            },
+            {
+              "python_version": "3.11"
+              "ansible_version": "stable-2.9"
+            },
+            {
+              "python_version": "3.11"
+              "ansible_version": "stable-2.11"
+            }
+          ]
 env:
   COLORTERM: 'yes'
   TERM: 'xterm-256color'
@@ -70,35 +131,7 @@ jobs:
       matrix:
         python_version: ["2.7", "3.8", "3.9", "3.11"]
         ansible_version: ["stable-2.9", "stable-2.14", "milestone", "devel"]
-        exclude:
-          - python_version: "2.7"
-            ansible_version: "stable-2.11"
-          - python_version: "2.7"
-            ansible_version: "stable-2.14"
-          - python_version: "2.7"
-            ansible_version: "milestone"
-          - python_version: "2.7"
-            ansible_version: "devel"
-          - python_version: "3.8"
-            ansible_version: "stable-2.14"
-          - python_version: "3.8"
-            ansible_version: "milestone"
-          - python_version: "3.8"
-            ansible_version: "devel"
-          - python_version: "3.9"
-            ansible_version: "stable-2.9"
-          - python_version: "3.9"
-            ansible_version: "stable-2.11"
-          - python_version: "3.9"
-            ansible_version: "stable-2.14"
-          - python_version: "3.9"
-            ansible_version: "milestone"
-          - python_version: "3.9"
-            ansible_version: "devel"
-          - python_version: "3.11"
-            ansible_version: "stable-2.9"
-          - python_version: "3.11"
-            ansible_version: "stable-2.11"
+        exclude: ${{ fromJSON(inputs.sanity_excludes) }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
