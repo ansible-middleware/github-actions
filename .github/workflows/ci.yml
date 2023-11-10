@@ -19,59 +19,59 @@ on:
         default: >-
           [
             {
-              "python_version": "2.7"
+              "python_version": "2.7",
               "ansible_version": "stable-2.11"
             },
             {
-              "python_version": "2.7"
+              "python_version": "2.7",
               "ansible_version": "stable-2.14"
             },
             {
-              "python_version": "2.7"
+              "python_version": "2.7",
               "ansible_version": "milestone"
             },
             {
-              "python_version": "2.7"
+              "python_version": "2.7",
               "ansible_version": "devel"
             },
             {
-              "python_version": "3.8"
+              "python_version": "3.8",
               "ansible_version": "stable-2.14"
             },
             {
-              "python_version": "3.8"
+              "python_version": "3.8",
               "ansible_version": "milestone"
             },
             {
-              "python_version": "3.8"
+              "python_version": "3.8",
               "ansible_version": "devel"
             },
             {
-              "python_version": "3.9"
+              "python_version": "3.9",
               "ansible_version": "stable-2.9"
             },
             {
-              "python_version": "3.9"
+              "python_version": "3.9",
               "ansible_version": "stable-2.11"
             },
             {
-              "python_version": "3.9"
+              "python_version": "3.9",
               "ansible_version": "stable-2.14"
             },
             {
-              "python_version": "3.9"
+              "python_version": "3.9",
               "ansible_version": "milestone"
             },
             {
-              "python_version": "3.9"
+              "python_version": "3.9",
               "ansible_version": "devel"
             },
             {
-              "python_version": "3.11"
+              "python_version": "3.11",
               "ansible_version": "stable-2.9"
             },
             {
-              "python_version": "3.11"
+              "python_version": "3.11",
               "ansible_version": "stable-2.11"
             }
           ]
