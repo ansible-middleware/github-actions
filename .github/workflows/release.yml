@@ -6,9 +6,14 @@ on:
       collection_fqcn:
         required: true
         type: string
+      downstream_name:
+        required: false
+        type: string
     secrets:
       galaxy_token:
         required: true
+      jira_webhook:
+        required: false
 
 jobs:
   release:
@@ -95,6 +100,16 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.TAG_VERSION }}
           files: "*.tar.gz"
           body_path: gh-release.md
+
+      - name: Create version in jira
+        env:
+          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
+          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
+          VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
+        run: |
+          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
+             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${DOWNSTREAM_NAME}-${VERSION}"}}' $JIRA_WEBHOOK 
+          fi
 
       - name: Get next version
         id: bump_version
