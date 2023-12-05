@@ -201,10 +201,10 @@ jobs:
       - name: Install ansible and molecule
         run: |
           python -m pip install --upgrade pip
-          pip install 'molecule>=5.0.1' 'molecule-plugins[docker]>=23.0.0' ansible-core==${{ matrix.ansible_version }}
+          pip install --progress-bar off 'molecule>=5.0.1' 'molecule-plugins[docker]>=23.0.0' ansible-core==${{ matrix.ansible_version }}
           if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
             echo "=== Installing python deps"
-            pip install -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+            pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
           fi
           if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
             echo "=== Installing dependencies"
