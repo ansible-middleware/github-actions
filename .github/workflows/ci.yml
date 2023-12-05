@@ -91,7 +91,7 @@ jobs:
         ansible_version: ["2.15"]
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
@@ -139,7 +139,7 @@ jobs:
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
@@ -188,7 +188,7 @@ jobs:
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
@@ -209,6 +209,7 @@ jobs:
             ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
           fi
           if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
+            ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml
             ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
           fi
 
