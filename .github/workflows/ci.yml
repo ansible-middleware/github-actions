@@ -203,12 +203,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install 'molecule>=5.0.1' 'molecule-plugins[docker]>=23.0.0' ansible-core==${{ matrix.ansible_version }}
           if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
+            echo "=== Installing python deps"
             pip install -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
           fi
           if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
+            echo "=== Installing dependencies"
             ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
           fi
           if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
+            echo "=== Installing test dependencies"
             ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml
             ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
           fi
