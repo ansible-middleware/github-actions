@@ -101,19 +101,19 @@ jobs:
           files: "*.tar.gz"
           body_path: gh-release.md
 
-      - name: Create version in jira
-        env:
-          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
-          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
-          VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
-        run: |
-          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
-             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${DOWNSTREAM_NAME}-${VERSION}"}}' $JIRA_WEBHOOK 
-          fi
-
       - name: Get next version
         id: bump_version
         run: echo "::set-output name=NEXT_VERSION::$(echo ${{ steps.get_version.outputs.TAG_VERSION }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g' )"
+
+      - name: Create next version in jira
+        env:
+          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
+          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
+          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+        run: |
+          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
+             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${DOWNSTREAM_NAME}-${NEXT_VERSION}"}}' $JIRA_WEBHOOK 
+          fi
 
       - name: Bump version
         env:
