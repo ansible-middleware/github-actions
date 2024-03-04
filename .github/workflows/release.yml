@@ -112,7 +112,7 @@ jobs:
           NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
         run: |
           if [[ ! -z "$JIRA_WEBHOOK" ]]; then
-             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${DOWNSTREAM_NAME}-${NEXT_VERSION}"}}' $JIRA_WEBHOOK 
+             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${{ inputs.downstream_name }}-${{ steps.bump_version.outputs.NEXT_VERSION }}"}}' $JIRA_WEBHOOK
           fi
 
       - name: Bump version
