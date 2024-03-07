@@ -220,7 +220,7 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
-              ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml
+              ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
               ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
             fi
 
