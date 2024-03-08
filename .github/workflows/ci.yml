@@ -223,6 +223,7 @@ jobs:
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
               ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
             fi
+            exit 0
 
       - name: Run molecule test
         run: |
