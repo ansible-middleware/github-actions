@@ -96,7 +96,7 @@ jobs:
           path: ansible_collections/${{ inputs.fqcn }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
@@ -123,7 +123,7 @@ jobs:
             fi
 
       - name: Install ansible-lint custom rules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ansible-middleware/ansible-lint-custom-rules
           path: ansible-lint-custom-rules/
@@ -154,7 +154,7 @@ jobs:
           ln -s ${{ github.workspace }} /home/runner/.ansible/collections
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         if: matrix.python_version != '2.7'
         with:
           python-version: ${{ matrix.python_version }}
@@ -198,7 +198,7 @@ jobs:
           path: ansible_collections/${{ inputs.fqcn }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
