@@ -218,7 +218,7 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps -vvv
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
