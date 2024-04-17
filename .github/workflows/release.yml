@@ -9,6 +9,9 @@ on:
       downstream_name:
         required: false
         type: string
+      release_summary:
+        required: false
+        type: string
     secrets:
       galaxy_token:
         required: true
@@ -75,6 +78,7 @@ jobs:
           commit_ghpages: false
           changelog_release: true
           generate_docs: false
+          release_summary: ${{ inputs.release_summary }}
           token: ${{ secrets.GITHUB_TOKEN }}
           bot_email: ansible-middleware-core@redhat.com
           bot_account: ansible-middleware-core
