@@ -9,6 +9,10 @@ on:
       collection_fqcn:
         required: true
         type: string
+      historical_docs:
+        required: false
+        type: string
+        default: 'true'
 
 env:
   COLORTERM: 'yes'
@@ -69,3 +73,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           bot_email: ansible-middleware-core@redhat.com
           bot_account: ansible-middleware-core
+          historical_docs: ${{ inputs.historical_docs }}
+
