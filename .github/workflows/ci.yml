@@ -139,7 +139,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["2.7", "3.8", "3.9", "3.11"]
-        ansible_version: ["stable-2.9", "stable-2.14", "milestone", "devel"]
+        ansible_version: ["stable-2.9", "stable-2.15", "milestone", "devel"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
@@ -189,7 +189,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.14", "2.15"]
+        ansible_version: ["2.15", "2.16"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
     steps:
       - name: Check out code
