@@ -211,7 +211,7 @@ jobs:
           max_attempts: 3
           command: |
             python -m pip install --upgrade pip
-            pip install --progress-bar off 'molecule>=5.0.1' 'molecule-plugins[docker]>=23.0.0' ansible-core~=${{ matrix.ansible_version }}
+            pip install --progress-bar off 'molecule==24.2.0' 'molecule-plugins>=23.0.0' ansible-core~=${{ matrix.ansible_version }}
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
               pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
