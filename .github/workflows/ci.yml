@@ -24,7 +24,7 @@ on:
             },
             {
               "python_version": "2.7",
-              "ansible_version": "stable-2.14"
+              "ansible_version": "stable-2.15"
             },
             {
               "python_version": "2.7",
@@ -36,7 +36,7 @@ on:
             },
             {
               "python_version": "3.8",
-              "ansible_version": "stable-2.14"
+              "ansible_version": "stable-2.15"
             },
             {
               "python_version": "3.8",
@@ -56,7 +56,7 @@ on:
             },
             {
               "python_version": "3.9",
-              "ansible_version": "stable-2.14"
+              "ansible_version": "stable-2.15"
             },
             {
               "python_version": "3.9",
