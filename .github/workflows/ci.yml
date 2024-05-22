@@ -185,7 +185,7 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python_version: ["3.11"]
@@ -211,7 +211,7 @@ jobs:
           max_attempts: 3
           command: |
             python -m pip install --upgrade pip
-            pip install --progress-bar off 'molecule==24.2.0' 'molecule-plugins[docker]>=23.0.0' ansible-core~=${{ matrix.ansible_version }}
+            pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' ansible-core~=${{ matrix.ansible_version }}
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
               pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
@@ -225,6 +225,7 @@ jobs:
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
               ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
             fi
+            python -m pip install 'requests<2.32'
             exit 0
 
       - name: Run molecule test
