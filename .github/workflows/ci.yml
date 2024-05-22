@@ -189,7 +189,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.16", "2.17"]
+        ansible_version: ["2.15", "2.16"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
     steps:
       - name: Check out code
@@ -211,7 +211,9 @@ jobs:
           max_attempts: 3
           command: |
             python -m pip install --upgrade pip
-            pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' 'ansible-core<${{ matrix.ansible_version }}'
+            ansible_ver='${{ matrix.ansible_version }}'
+            ansible_next_ver="2.$((${ansible_ver#*.}+1))"
+            pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' 'ansible-core<${ansible_next_ver}'
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
               pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
