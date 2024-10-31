@@ -179,6 +179,7 @@ jobs:
         python_version: ["3.11"]
         ansible_version: ["2.15", "2.16"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
+      fail-fast: false
     steps:
       - name: Check out code
         uses: actions/checkout@v4
