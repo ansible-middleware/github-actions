@@ -189,7 +189,7 @@ jobs:
         run: |
           echo "IPv4: $(curl --ipv4 --silent --max-time 15 --retry 3 --user-agent Mozilla https://api.ip.sb/geoip)"
           echo "IPv6: $(curl --ipv6 --silent --max-time 15 --retry 3 --user-agent Mozilla https://api.ip.sb/geoip)"
-          echo "precedence ::ffff:0:0/96  100" | sudo tee -a "$gai_config_file_path"
+          echo "precedence ::ffff:0:0/96  100" | sudo tee -a /etc/gai.conf
 
       - name: Check out code
         uses: actions/checkout@v4
