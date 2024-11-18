@@ -181,7 +181,7 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
-    runs-on: ubuntu-latest
+    runs-on: rhel
     strategy:
       matrix:
         python_version: ["3.11"]
