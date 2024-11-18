@@ -181,7 +181,7 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
-    runs-on: ubuntu-latest
+    runs-on: rhel
     strategy:
       matrix:
         python_version: ["3.11"]
@@ -194,12 +194,6 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
-          cache: 'pip'
-
       - name: Install ansible and molecule
         uses: nick-fields/retry@v3
         with:
@@ -210,6 +204,8 @@ jobs:
             python -m pip install --upgrade pip
             ansible_ver='${{ matrix.ansible_version }}'
             ansible_next_ver="2.$((${ansible_ver#*.}+1))"
+            virtualenv -p python3.11 /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11
+            source /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11/bin/activate
             pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' "ansible-core<${ansible_next_ver}"
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
