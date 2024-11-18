@@ -201,10 +201,10 @@ jobs:
           retry_wait_seconds: 60
           max_attempts: 3
           command: |
-            python -m pip install --upgrade pip
+            python3 -m pip install --upgrade pip
             ansible_ver='${{ matrix.ansible_version }}'
             ansible_next_ver="2.$((${ansible_ver#*.}+1))"
-            virtualenv -p python3.11 /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11
+            python3 -m venv /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11
             source /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11/bin/activate
             pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' "ansible-core<${ansible_next_ver}"
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
