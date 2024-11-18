@@ -225,6 +225,7 @@ jobs:
 
       - name: Run molecule test
         run: |
+          source /home/guido/virtualenv/${{ matrix.ansible_version }}_py3.11/bin/activate
           molecule --version
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
