@@ -20,7 +20,7 @@ on:
           [
             {
               "python_version": "3.9",
-              "ansible_version": "stable-2.15"
+              "ansible_version": "stable-2.16"
             },
             {
               "python_version": "3.9",
@@ -32,11 +32,7 @@ on:
             },
             {
               "python_version": "3.11",
-              "ansible_version": "stable-2.14"
-            },
-            {
-              "python_version": "3.11",
-              "ansible_version": "stable-2.11"
+              "ansible_version": "milestone"
             },
             {
               "python_version": "3.11",
@@ -44,11 +40,11 @@ on:
             },
             {
               "python_version": "3.12",
-              "ansible_version": "stable-2.14"
+              "ansible_version": "stable-2.15"
             },
             {
               "python_version": "3.12",
-              "ansible_version": "stable-2.15"
+              "ansible_version": "stable-2.16"
             },
             {
               "python_version": "3.12",
@@ -76,7 +72,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.15"]
+        ansible_version: ["2.16"]
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -127,7 +123,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.9", "3.11", "3.12"]
-        ansible_version: ["stable-2.14", "stable-2.15", "milestone", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "milestone", "devel"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
