@@ -45,10 +45,6 @@ on:
             {
               "python_version": "3.12",
               "ansible_version": "stable-2.16"
-            },
-            {
-              "python_version": "3.12",
-              "ansible_version": "milestone"
             }
           ]
       fail_fast:
