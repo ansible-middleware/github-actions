@@ -20,10 +20,6 @@ on:
           [
             {
               "python_version": "3.9",
-              "ansible_version": "stable-2.14"
-            },
-            {
-              "python_version": "3.9",
               "ansible_version": "stable-2.15"
             },
             {
