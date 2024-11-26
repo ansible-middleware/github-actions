@@ -235,10 +235,10 @@ jobs:
           retry_wait_seconds: 60
           max_attempts: 3
           command: |
-            python -m pip install --upgrade pip
+            python3.11 -m pip install --upgrade pip
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
-              pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+              python3.11 -m pip3 install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
@@ -249,7 +249,7 @@ jobs:
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
               ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
             fi
-            python -m pip install 'requests<2.32'
+            python3.11 -m pip3 install 'requests<2.32'
             exit 0
 
       - name: Run molecule test
