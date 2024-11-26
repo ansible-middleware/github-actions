@@ -164,12 +164,12 @@ jobs:
           ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
-  molecule:
-    runs-on: self-hosted
+  molecule_2_15:
+    runs-on: molecule-2.15
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.15", "2.16"]
+        ansible_version: ["2.15"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:
@@ -177,12 +177,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: ansible_collections/${{ inputs.fqcn }}
-
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
-          cache: 'pip'
 
       - name: Install ansible and molecule
         uses: nick-fields/retry@v3
@@ -192,9 +186,56 @@ jobs:
           max_attempts: 3
           command: |
             python -m pip install --upgrade pip
-            ansible_ver='${{ matrix.ansible_version }}'
-            ansible_next_ver="2.$((${ansible_ver#*.}+1))"
-            pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' "ansible-core<${ansible_next_ver}"
+            if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
+              echo "=== Installing python deps"
+              pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+            fi
+            if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
+              echo "=== Installing dependencies"
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+            fi
+            if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
+              echo "=== Installing test dependencies"
+              ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+            fi
+            python -m pip install 'requests<2.32'
+            exit 0
+
+      - name: Run molecule test
+        run: |
+          molecule --version
+          molecule test -s ${{ matrix.molecule_test }}
+        working-directory: ./ansible_collections/${{ inputs.fqcn }}
+        env:
+          ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
+          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
+          PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
+          STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
+          STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
+
+  molecule_2_16:
+    runs-on: molecule-2.16
+    strategy:
+      matrix:
+        python_version: ["3.11"]
+        ansible_version: ["2.16"]
+        molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
+      fail-fast: ${{ inputs.fail_fast }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/${{ inputs.fqcn }}
+
+      - name: Install ansible and molecule
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          retry_wait_seconds: 60
+          max_attempts: 3
+          command: |
+            python -m pip install --upgrade pip
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
               pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
