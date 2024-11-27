@@ -267,7 +267,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test --parallel -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
@@ -315,7 +315,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test --parallel -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
