@@ -270,7 +270,7 @@ jobs:
           molecule test --parallel -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
-          ANSIBLE_REMOTE_TMP: "/tmp/tmp-2.15-${{ matrix.molecule_test }}"
+          ANSIBLE_REMOTE_TMP: "/tmp-2.15-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
@@ -319,7 +319,7 @@ jobs:
           molecule test --parallel -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
-          ANSIBLE_REMOTE_TMP: "/tmp/tmp-2.16-${{ matrix.molecule_test }}"
+          ANSIBLE_REMOTE_TMP: "/tmp-2.16-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
