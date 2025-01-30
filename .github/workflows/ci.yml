@@ -9,6 +9,9 @@ on:
       molecule_tests:
         required: true
         type: string
+      root_permission_varname:
+        required: false
+        type: string
       sanity_includes:
         required: false
         type: string
@@ -213,7 +216,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test -s ${{ matrix.molecule_test }} -- -e ${{ inputs.root_permission_varname }}=false
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
