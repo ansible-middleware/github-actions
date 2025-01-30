@@ -9,7 +9,7 @@ on:
       molecule_tests:
         required: true
         type: string
-      sanity_includes:
+      root_permission_varname:
         required: false
         type: string
         default: "[]"
@@ -213,11 +213,12 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test -e ${{ inputs.root_permission_varname }}=false -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
-          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
+          :$
+        PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
           STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
           STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
