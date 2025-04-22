@@ -25,18 +25,6 @@ on:
         default: >-
           [
             {
-              "python_version": "3.9",
-              "ansible_version": "stable-2.16"
-            },
-            {
-              "python_version": "3.9",
-              "ansible_version": "milestone"
-            },
-            {
-              "python_version": "3.9",
-              "ansible_version": "devel"
-            },
-            {
               "python_version": "3.11",
               "ansible_version": "milestone"
             },
@@ -124,8 +112,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.9", "3.11", "3.12"]
-        ansible_version: ["stable-2.15", "stable-2.16", "milestone", "devel"]
+        python_version: ["3.11", "3.12"]
+        ansible_version: ["stable-2.16", "stable-2.17", "milestone", "devel"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
