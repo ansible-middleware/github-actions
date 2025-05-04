@@ -9,6 +9,9 @@ on:
       molecule_tests:
         required: true
         type: string
+      root_permission_varname:
+        required: false
+        type: string
       podman_tests_current:
         required: true
         type: string
@@ -207,7 +210,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test -s ${{ matrix.molecule_test }} -- -e ${{ inputs.root_permission_varname }}=false
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
@@ -255,7 +258,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test -s ${{ matrix.molecule_test }} -- -e ${{ inputs.root_permission_varname }}=false
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_REMOTE_TMP: "/tmp-2.15-${{ matrix.molecule_test }}"
@@ -306,7 +309,7 @@ jobs:
       - name: Run molecule test
         run: |
           molecule --version
-          molecule test -s ${{ matrix.molecule_test }}
+          molecule test -s ${{ matrix.molecule_test }} -- -e ${{ inputs.root_permission_varname }}=false
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_REMOTE_TMP: "/tmp-2.16-${{ matrix.molecule_test }}"
