@@ -215,6 +215,8 @@ jobs:
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
           STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
           STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
+          PROXY: '44.200.60.140:3128'
+          NO_PROXY: 'localhost,.redhat.com,.ansible.com'
 
   molecule_current:
     runs-on: molecule-2.15
