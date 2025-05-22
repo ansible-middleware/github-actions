@@ -160,6 +160,7 @@ jobs:
 
   molecule:
     runs-on: ubuntu-22.04
+    if: ${{ inputs.molecule_tests != '[]' && inputs.molecule_tests != '' }}
     strategy:
       matrix:
         python_version: ["3.11"]
