@@ -49,6 +49,10 @@ on:
               "python_version": "3.12",
               "ansible_version": "stable-2.16"
             }
+            {
+              "python_version": "3.12",
+              "ansible_version": "stable-2.19"
+            }
           ]
       fail_fast:
         required: false
@@ -71,7 +75,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.16"]
+        ansible_version: ["2.19"]
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -122,7 +126,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.9", "3.11", "3.12"]
-        ansible_version: ["stable-2.15", "stable-2.16", "milestone", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "stable-2.19", "milestone", "devel"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
@@ -172,7 +176,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.15", "2.16"]
+        ansible_version: ["2.15", "2.16", "2.19"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:

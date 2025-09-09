@@ -55,6 +55,10 @@ on:
               "python_version": "3.12",
               "ansible_version": "stable-2.16"
             }
+            {
+              "python_version": "3.12",
+              "ansible_version": "stable-2.19"
+            }
           ]
       fail_fast:
         required: false
@@ -77,7 +81,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.16"]
+        ansible_version: ["2.19"]
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -128,7 +132,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.9", "3.11", "3.12"]
-        ansible_version: ["stable-2.15", "stable-2.16", "milestone", "devel"]
+        ansible_version: ["stable-2.15", "stable-2.16", "stable-2.19", "milestone", "devel"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
@@ -178,7 +182,7 @@ jobs:
     strategy:
       matrix:
         python_version: ["3.11"]
-        ansible_version: ["2.15", "2.16"]
+        ansible_version: ["2.15", "2.16", "2.19"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:
@@ -281,7 +285,7 @@ jobs:
           STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
 
   molecule_next:
-    runs-on: molecule-2.16
+    runs-on: molecule-2.19
     strategy:
       matrix:
         python_version: ["3.11"]
@@ -322,7 +326,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }} -- -e ${{ inputs.root_permission_varname }}=false
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
-          ANSIBLE_REMOTE_TMP: "/tmp-2.16-${{ matrix.molecule_test }}"
+          ANSIBLE_REMOTE_TMP: "/tmp-2.19-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
