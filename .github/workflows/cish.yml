@@ -12,6 +12,9 @@ on:
       podman_tests_current:
         required: true
         type: string
+      podman_tests_middle:
+        required: true
+        type: string
       podman_tests_next:
         required: true
         type: string
@@ -22,29 +25,7 @@ on:
       sanity_excludes:
         required: false
         type: string
-        default: >-
-          [
-            {
-              "python_version": "3.11",
-              "ansible_version": "milestone"
-            },
-            {
-              "python_version": "3.11",
-              "ansible_version": "devel"
-            },
-            {
-              "python_version": "3.12",
-              "ansible_version": "stable-2.15"
-            },
-            {
-              "python_version": "3.12",
-              "ansible_version": "stable-2.16"
-            },
-            {
-              "python_version": "3.12",
-              "ansible_version": "stable-2.19"
-            }
-          ]
+        default: "[]"
       fail_fast:
         required: false
         type: boolean
@@ -65,8 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.11"]
-        ansible_version: ["2.19"]
+        python_version: ["3.12"]
+        ansible_version: ["2.18", "2.19", "2.20"]
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -116,8 +97,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ["3.11", "3.12"]
-        ansible_version: ["stable-2.16", "stable-2.17", "stable-2.19", "milestone", "devel"]
+        python_version: ["3.12"]
+        ansible_version: ["stable-2.18", "stable-2.19", "stable-2.20"]
         exclude: ${{ fromJSON(inputs.sanity_excludes) }}
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
@@ -167,8 +148,8 @@ jobs:
     if: ${{ inputs.molecule_tests != '[]' && inputs.molecule_tests != '' }}
     strategy:
       matrix:
-        python_version: ["3.11"]
-        ansible_version: ["2.16", "2.17", "2.19"]
+        python_version: ["3.12"]
+        ansible_version: ["2.18", "2.19", "2.20"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:
@@ -222,10 +203,10 @@ jobs:
           STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
 
   molecule_current:
-    runs-on: molecule-2.15
+    runs-on: molecule-2.18
     strategy:
       matrix:
-        python_version: ["3.11"]
+        python_version: ["3.12"]
         molecule_test: ${{ fromJSON(inputs.podman_tests_current) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:
@@ -241,10 +222,10 @@ jobs:
           retry_wait_seconds: 60
           max_attempts: 3
           command: |
-            python3.11 -m pip install --upgrade pip
+            python3.12 -m pip install --upgrade pip
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
-              python3.11 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+              python3.12 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
@@ -263,7 +244,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
-          ANSIBLE_REMOTE_TMP: "/tmp-2.15-${{ matrix.molecule_test }}"
+          ANSIBLE_REMOTE_TMP: "/tmp-2.18-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
@@ -272,12 +253,12 @@ jobs:
           PROXY: '10.88.0.1:3128'
           NO_PROXY: 'localhost,.redhat.com,.ansible.com'
 
-  molecule_next:
+  molecule_middle:
     runs-on: molecule-2.19
     strategy:
       matrix:
-        python_version: ["3.11"]
-        molecule_test: ${{ fromJSON(inputs.podman_tests_next) }}
+        python_version: ["3.12"]
+        molecule_test: ${{ fromJSON(inputs.podman_tests_middle) }}
       fail-fast: ${{ inputs.fail_fast }}
     steps:
       - name: Check out code
@@ -292,10 +273,10 @@ jobs:
           retry_wait_seconds: 60
           max_attempts: 3
           command: |
-            python3.11 -m pip install --upgrade pip
+            python3.12 -m pip install --upgrade pip
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
-              python3.11 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+              python3.12 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
@@ -315,6 +296,57 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
           ANSIBLE_REMOTE_TMP: "/tmp-2.19-${{ matrix.molecule_test }}"
+          ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
+          PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
+          PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
+          STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
+          STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
+          PROXY: '10.88.0.1:3128'
+          NO_PROXY: 'localhost,.redhat.com,.ansible.com'
+
+  molecule_next:
+    runs-on: molecule-2.20
+    strategy:
+      matrix:
+        python_version: ["3.12"]
+        molecule_test: ${{ fromJSON(inputs.podman_tests_next) }}
+      fail-fast: ${{ inputs.fail_fast }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/${{ inputs.fqcn }}
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          retry_wait_seconds: 60
+          max_attempts: 3
+          command: |
+            python3.12 -m pip install --upgrade pip
+            if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
+              echo "=== Installing python deps"
+              python3.12 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+            fi
+            if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
+              echo "=== Installing dependencies"
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+            fi
+            if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
+              echo "=== Installing test dependencies"
+              ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+            fi
+            exit 0
+
+      - name: Run molecule test
+        run: |
+          molecule --version
+          molecule test -s ${{ matrix.molecule_test }}
+        working-directory: ./ansible_collections/${{ inputs.fqcn }}
+        env:
+          ANSIBLE_REMOTE_TMP: "/tmp-2.20-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
