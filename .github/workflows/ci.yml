@@ -37,7 +37,7 @@ env:
 
 jobs:
   linter:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         python_version: ["3.12"]
@@ -88,7 +88,7 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   sanity:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         python_version: ["3.12"]
@@ -138,7 +138,7 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         python_version: ["3.12"]
