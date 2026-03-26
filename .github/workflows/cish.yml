@@ -215,6 +215,17 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
+      - name: Ensure podman is available
+        run: |
+          if ! command -v podman &> /dev/null; then
+            echo "::warning::podman not found in PATH, attempting to install"
+            dnf install -y podman 2>/dev/null || sudo dnf install -y podman || {
+              echo "::error::Failed to install podman. The self-hosted runner image needs podman pre-installed."
+              exit 1
+            }
+          fi
+          echo "podman $(podman --version)"
+
       - name: Install ansible and molecule
         uses: nick-fields/retry@v3
         with:
@@ -266,6 +277,17 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
+      - name: Ensure podman is available
+        run: |
+          if ! command -v podman &> /dev/null; then
+            echo "::warning::podman not found in PATH, attempting to install"
+            dnf install -y podman 2>/dev/null || sudo dnf install -y podman || {
+              echo "::error::Failed to install podman. The self-hosted runner image needs podman pre-installed."
+              exit 1
+            }
+          fi
+          echo "podman $(podman --version)"
+
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
@@ -316,6 +338,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: ansible_collections/${{ inputs.fqcn }}
+
+      - name: Ensure podman is available
+        run: |
+          if ! command -v podman &> /dev/null; then
+            echo "::warning::podman not found in PATH, attempting to install"
+            dnf install -y podman 2>/dev/null || sudo dnf install -y podman || {
+              echo "::error::Failed to install podman. The self-hosted runner image needs podman pre-installed."
+              exit 1
+            }
+          fi
+          echo "podman $(podman --version)"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
