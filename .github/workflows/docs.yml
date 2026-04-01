@@ -35,6 +35,9 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
           fetch-depth: 0
+          # collection-docs-action runs `git describe --abbrev=0 --tags`; checkout
+          # defaults fetch-tags to false, which yields exit 128 when no tags exist.
+          fetch-tags: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
