@@ -255,6 +255,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
+          ANSIBLE_REMOTE_TMP: /tmp
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
@@ -316,6 +317,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
+          ANSIBLE_REMOTE_TMP: /tmp
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
@@ -377,6 +379,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
+          ANSIBLE_REMOTE_TMP: /tmp
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
