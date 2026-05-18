@@ -25,6 +25,19 @@ on:
         required: false
         type: string
         default: '0'
+    secrets:
+      PROD_JBOSSNETWORK_API_CLIENTID:
+        required: false
+      PROD_JBOSSNETWORK_API_SECRET:
+        required: false
+      UNIFIED_DOWNLOADS_API_CLIENTID:
+        required: false
+      UNIFIED_DOWNLOADS_API_SECRET:
+        required: false
+      STAGE_JBOSSNETWORK_API_CLIENTID:
+        required: false
+      STAGE_JBOSSNETWORK_API_SECRET:
+        required: false
 env:
   COLORTERM: 'yes'
   TERM: 'xterm-256color'
