@@ -25,6 +25,14 @@ on:
         required: false
         type: string
         default: '0'
+      checkout_ref:
+        required: false
+        type: string
+        description: 'Git ref to checkout (e.g., PR head SHA for fork testing)'
+      checkout_repository:
+        required: false
+        type: string
+        description: 'Repository to checkout (e.g., fork repo for fork testing)'
     secrets:
       PROD_JBOSSNETWORK_API_CLIENTID:
         required: false
@@ -54,12 +62,14 @@ jobs:
         ansible_version: ["2.18", "2.19", "2.20"]
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ansible_collections/${{ inputs.fqcn }}
+          ref: ${{ inputs.checkout_ref || github.ref }}
+          repository: ${{ inputs.checkout_repository || github.repository }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
@@ -86,7 +96,7 @@ jobs:
             fi
 
       - name: Install ansible-lint custom rules
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ansible-middleware/ansible-lint-custom-rules
           path: ansible-lint-custom-rules/
@@ -107,9 +117,11 @@ jobs:
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ansible_collections/${{ inputs.fqcn }}
+          ref: ${{ inputs.checkout_ref || github.ref }}
+          repository: ${{ inputs.checkout_repository || github.repository }}
 
       - name: Create default collection path
         run: |
@@ -117,7 +129,7 @@ jobs:
           ln -s ${{ github.workspace }} /home/runner/.ansible/collections
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         if: matrix.python_version != '2.7'
         with:
           python-version: ${{ matrix.python_version }}
@@ -157,12 +169,14 @@ jobs:
       fail-fast: ${{ inputs.fail_fast }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ansible_collections/${{ inputs.fqcn }}
+          ref: ${{ inputs.checkout_ref || github.ref }}
+          repository: ${{ inputs.checkout_repository || github.repository }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
