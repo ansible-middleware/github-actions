@@ -17,6 +17,8 @@ on:
         required: true
       jira_webhook:
         required: false
+      push_token:
+        required: false
 
 jobs:
   release:
@@ -35,6 +37,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          token: ${{ secrets.push_token || github.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -44,11 +47,11 @@ jobs:
 
       - name: Get current version
         id: get_version
-        run: echo "::set-output name=TAG_VERSION::$(grep version galaxy.yml | awk -F'"' '{ print $2 }')"
+        run: echo "TAG_VERSION=$(grep version galaxy.yml | awk -F'"' '{ print $2 }')" >> "$GITHUB_OUTPUT"
 
       - name: Check if tag exists
         id: check_tag
-        run: echo "::set-output name=TAG_EXISTS::$(git tag | grep ${{ steps.get_version.outputs.TAG_VERSION }})"
+        run: echo "TAG_EXISTS=$(git tag | grep ${{ steps.get_version.outputs.TAG_VERSION }})" >> "$GITHUB_OUTPUT"
 
       - name: Fail if tag exists
         if: ${{ steps.get_version.outputs.TAG_VERSION == steps.check_tag.outputs.TAG_EXISTS }}
@@ -79,7 +82,7 @@ jobs:
           changelog_release: true
           generate_docs: false
           release_summary: ${{ inputs.release_summary }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.push_token || github.token }}
           bot_email: ansible-middleware-core@redhat.com
           bot_account: ansible-middleware-core
 
@@ -107,7 +110,7 @@ jobs:
 
       - name: Get next version
         id: bump_version
-        run: echo "::set-output name=NEXT_VERSION::$(echo ${{ steps.get_version.outputs.TAG_VERSION }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g' )"
+        run: echo "NEXT_VERSION=$(echo ${{ steps.get_version.outputs.TAG_VERSION }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g' )" >> "$GITHUB_OUTPUT"
 
       - name: Create next version in jira
         env:
@@ -131,4 +134,4 @@ jobs:
           sed -i -e "s#version: \"$TAG_VERSION\"#version: \"$NEXT_VERSION\"#" galaxy.yml
           git add galaxy.yml
           git commit -m "Bump version to $NEXT_VERSION"
-          git push
+          git push origin
