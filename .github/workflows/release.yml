@@ -30,17 +30,18 @@ jobs:
       deployments: write
       packages: write
       pages: write
+      pull-requests: write
     outputs:
       tag_version: ${{ steps.get_version.outputs.TAG_VERSION }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ secrets.push_token || github.token }}
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: 'pip'
@@ -71,7 +72,7 @@ jobs:
         run: |
           ansible-galaxy collection build .
 
-      - name: Create changelog and documentation
+      - name: Create changelog PR
         uses: ansible-middleware/collection-docs-action@main
         with:
           collection_fqcn: ${{ inputs.collection_fqcn }}
@@ -85,53 +86,3 @@ jobs:
           token: ${{ secrets.push_token || github.token }}
           bot_email: ansible-middleware-core@redhat.com
           bot_account: ansible-middleware-core
-
-      - name: Publish collection
-        env:
-          ANSIBLE_GALAXY_API_KEY: ${{ secrets.galaxy_token }}
-        run: |
-          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_API_KEY
-
-      - name: Create release tag
-        run: |
-          git config user.name ansible-middleware-core
-          git config user.email ansible-middleware-core@redhat.com
-          git tag -a ${{ steps.get_version.outputs.TAG_VERSION }} -m "Release v${{ steps.get_version.outputs.TAG_VERSION }}" || true
-          git push origin --tags
-
-      - name: Publish Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get_version.outputs.TAG_VERSION }}
-          files: "*.tar.gz"
-          body_path: gh-release.md
-
-      - name: Get next version
-        id: bump_version
-        run: echo "NEXT_VERSION=$(echo ${{ steps.get_version.outputs.TAG_VERSION }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g' )" >> "$GITHUB_OUTPUT"
-
-      - name: Create next version in jira
-        env:
-          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
-          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
-          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
-        run: |
-          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
-             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${{ inputs.downstream_name }}-${{ steps.bump_version.outputs.NEXT_VERSION }}"}}' $JIRA_WEBHOOK
-          fi
-
-      - name: Bump version
-        env:
-          TAG_VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
-          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
-        run: |
-          git config user.name ansible-middleware-core
-          git config user.email ansible-middleware-core@redhat.com
-          git checkout main || true
-          git pull || true
-          sed -i -e "s#version: \"$TAG_VERSION\"#version: \"$NEXT_VERSION\"#" galaxy.yml
-          git add galaxy.yml
-          git commit -m "Bump version to $NEXT_VERSION"
-          git push origin

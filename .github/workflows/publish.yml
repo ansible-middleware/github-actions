@@ -1,0 +1,117 @@
+---
+name: Publish collection
+on:
+  workflow_call:
+    inputs:
+      collection_fqcn:
+        required: true
+        type: string
+      downstream_name:
+        required: false
+        type: string
+    secrets:
+      galaxy_token:
+        required: true
+      jira_webhook:
+        required: false
+      push_token:
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      packages: write
+      pages: write
+      pull-requests: write
+    outputs:
+      tag_version: ${{ steps.get_version.outputs.TAG_VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.push_token || github.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+
+      - name: Get current version
+        id: get_version
+        run: echo "TAG_VERSION=$(grep version galaxy.yml | awk -F'"' '{ print $2 }')" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core antsibull
+          sudo apt --fix-missing update
+          sudo apt install -y sed hub
+
+      - name: Build collection
+        run: |
+          ansible-galaxy collection build .
+
+      - name: Publish collection
+        env:
+          ANSIBLE_GALAXY_API_KEY: ${{ secrets.galaxy_token }}
+        run: |
+          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_API_KEY
+
+      - name: Create release tag
+        run: |
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
+          git tag -a ${{ steps.get_version.outputs.TAG_VERSION }} -m "Release v${{ steps.get_version.outputs.TAG_VERSION }}" || true
+          git push origin --tags
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.TAG_VERSION }}
+          files: "*.tar.gz"
+          body_path: gh-release.md
+
+      - name: Get next version
+        id: bump_version
+        run: echo "NEXT_VERSION=$(echo ${{ steps.get_version.outputs.TAG_VERSION }} | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g' )" >> "$GITHUB_OUTPUT"
+
+      - name: Create next version in jira
+        env:
+          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
+          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
+          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+        run: |
+          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"data": {"version":"${{ inputs.downstream_name }}-${{ steps.bump_version.outputs.NEXT_VERSION }}"}}' \
+              $JIRA_WEBHOOK
+          fi
+
+      - name: Bump version
+        env:
+          TAG_VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
+          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+        run: |
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
+          git checkout main
+          git pull
+          sed -i -e "s#version: \"$TAG_VERSION\"#version: \"$NEXT_VERSION\"#" galaxy.yml
+          git add galaxy.yml
+          git commit -m "Bump version to $NEXT_VERSION"
+          BRANCH="bump/$NEXT_VERSION"
+          git checkout -b "${BRANCH}"
+          git push origin "${BRANCH}"
+          hub pull-request --no-edit \
+            --base main \
+            --head "${BRANCH}" \
+            --message "Bump version to $NEXT_VERSION"
