@@ -1,0 +1,47 @@
+---
+name: Vale Prose Lint
+description: Spell and grammar checks for ansible-middleware collections using Vale
+
+inputs:
+  vale-version:
+    description: Vale version to install
+    required: false
+    default: '3.15.1'
+  min-alert-level:
+    description: Minimum alert level to report (suggestion, warning, error)
+    required: false
+    default: warning
+
+runs:
+  using: composite
+  steps:
+    - name: Install Vale
+      shell: bash
+      run: |
+        wget -qO- "https://github.com/errata-ai/vale/releases/download/v${{ inputs.vale-version }}/vale_${{ inputs.vale-version }}_Linux_64-bit.tar.gz" \
+          | tar xz -C /usr/local/bin vale
+
+    - name: Merge shared vocabulary
+      shell: bash
+      run: |
+        mkdir -p .github/styles/config/vocabularies/Base
+        cat "${{ github.action_path }}/vocabularies/accept.txt" \
+          >> .github/styles/config/vocabularies/Base/accept.txt
+
+    - name: Download Vale styles
+      shell: bash
+      run: vale sync
+
+    - name: Lint prose files
+      shell: bash
+      run: vale --minAlertLevel "${{ inputs.min-alert-level }}" .
+
+    - name: Install Python dependencies
+      shell: bash
+      run: |
+        sudo apt-get install -y python3-docutils hunspell hunspell-en-us
+        pip install pyyaml
+
+    - name: Lint Ansible YAML name fields
+      shell: bash
+      run: python3 "${{ github.action_path }}/scripts/check_grammar_spelling.py"
