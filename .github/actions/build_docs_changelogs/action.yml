@@ -173,9 +173,15 @@ runs:
             echo "v${{ steps.changelog_version.outputs.TAG_VERSION }}" > gh-release.md
           fi
           echo "Sending changes"
-          git add CHANGELOG.rst changelogs/changelog.yaml
+          BRANCH="changelog/${{ steps.changelog_version.outputs.TAG_VERSION }}"
+          git checkout -b "${BRANCH}"
+          git add CHANGELOG.rst changelogs/changelog.yaml gh-release.md
           git commit -s -m "Update changelog for release ${{ steps.changelog_version.outputs.TAG_VERSION }}" || true
-          git push origin
+          git push origin "${BRANCH}"
+          hub pull-request --no-edit \
+            --base main \
+            --head "${BRANCH}" \
+            --message "Update changelog for release ${{ steps.changelog_version.outputs.TAG_VERSION }}"
         else
           echo "Skipping commit changelogs"
         fi

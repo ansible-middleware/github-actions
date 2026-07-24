@@ -62,14 +62,14 @@ jobs:
         ansible_version: ["2.18", "2.19", "2.20"]
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: ansible_collections/${{ inputs.fqcn }}
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
@@ -96,7 +96,7 @@ jobs:
             fi
 
       - name: Install ansible-lint custom rules
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ansible-middleware/ansible-lint-custom-rules
           path: ansible-lint-custom-rules/
@@ -117,7 +117,7 @@ jobs:
         include: ${{ fromJSON(inputs.sanity_includes) }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: ansible_collections/${{ inputs.fqcn }}
           ref: ${{ inputs.checkout_ref || github.ref }}
@@ -129,7 +129,7 @@ jobs:
           ln -s ${{ github.workspace }} /home/runner/.ansible/collections
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         if: matrix.python_version != '2.7'
         with:
           python-version: ${{ matrix.python_version }}
@@ -169,14 +169,14 @@ jobs:
       fail-fast: ${{ inputs.fail_fast }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: ansible_collections/${{ inputs.fqcn }}
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
           cache: 'pip'
