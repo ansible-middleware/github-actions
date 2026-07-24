@@ -100,6 +100,7 @@ jobs:
         env:
           TAG_VERSION: ${{ steps.get_version.outputs.TAG_VERSION }}
           NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+          GH_TOKEN: ${{ secrets.push_token || github.token }}
         run: |
           git config user.name ansible-middleware-core
           git config user.email ansible-middleware-core@redhat.com
@@ -111,7 +112,8 @@ jobs:
           BRANCH="bump/$NEXT_VERSION"
           git checkout -b "${BRANCH}"
           git push origin "${BRANCH}"
-          hub pull-request --no-edit \
+          gh pr create \
             --base main \
             --head "${BRANCH}" \
-            --message "Bump version to $NEXT_VERSION"
+            --title "Bump version to $NEXT_VERSION" \
+            --body "Bump version to $NEXT_VERSION"
