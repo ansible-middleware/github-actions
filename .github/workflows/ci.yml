@@ -134,7 +134,7 @@ jobs:
       - name: Run sanity tests
         run: |
           python -V
-          ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --exclude changelogs/fragments/.gitignore --skip-test symlinks
+          ansible-test sanity -v --color --requirements --python ${{ matrix.python_version }} --exclude molecule/ --exclude docs/conf.py --skip-test symlinks
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
