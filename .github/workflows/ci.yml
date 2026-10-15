@@ -80,7 +80,7 @@ jobs:
           ln -s ${{ github.workspace }} /home/runner/.ansible/collections
 
       - name: Install yamllint, ansible and dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           retry_wait_seconds: 60
@@ -160,10 +160,9 @@ jobs:
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
 
   molecule:
-    runs-on: ubuntu-22.04
+    runs-on: molecule-${{ matrix.ansible_version }}
     strategy:
       matrix:
-        python_version: ["3.12"]
         ansible_version: ["2.18", "2.19", "2.20"]
         molecule_test: ${{ fromJSON(inputs.molecule_tests) }}
       fail-fast: ${{ inputs.fail_fast }}
@@ -175,26 +174,17 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v7
-        with:
-          python-version: ${{ matrix.python_version }}
-          cache: 'pip'
-
-      - name: Install ansible and molecule
-        uses: nick-fields/retry@v3
+      - name: Install dependencies
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           retry_wait_seconds: 60
           max_attempts: 3
           command: |
-            python -m pip install --upgrade pip
-            ansible_ver='${{ matrix.ansible_version }}'
-            ansible_next_ver="2.$((${ansible_ver#*.}+1))"
-            pip install --progress-bar off 'molecule>=24.2.0' 'molecule-plugins[docker]>=23.0.0' "ansible-core<${ansible_next_ver}"
+            python3.12 -m pip install --upgrade pip
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.txt ]; then
               echo "=== Installing python deps"
-              pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
+              python3.12 -m pip install --progress-bar off -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
@@ -213,6 +203,7 @@ jobs:
           molecule test -s ${{ matrix.molecule_test }}
         working-directory: ./ansible_collections/${{ inputs.fqcn }}
         env:
+          ANSIBLE_REMOTE_TMP: "/tmp-${{ matrix.ansible_version }}-${{ matrix.molecule_test }}"
           ANSIBLE_VERBOSITY: ${{ inputs.debug_verbosity }}
           PROD_JBOSSNETWORK_API_CLIENTID: '${{ secrets.PROD_JBOSSNETWORK_API_CLIENTID }}'
           PROD_JBOSSNETWORK_API_SECRET: '${{ secrets.PROD_JBOSSNETWORK_API_SECRET }}'
@@ -220,3 +211,5 @@ jobs:
           UNIFIED_DOWNLOADS_API_SECRET: '${{ secrets.UNIFIED_DOWNLOADS_API_SECRET }}'
           STAGE_JBOSSNETWORK_API_CLIENTID: '${{ secrets.STAGE_JBOSSNETWORK_API_CLIENTID }}'
           STAGE_JBOSSNETWORK_API_SECRET: '${{ secrets.STAGE_JBOSSNETWORK_API_SECRET }}'
+          PROXY: '10.88.0.1:3128'
+          NO_PROXY: 'localhost,.redhat.com,.ansible.com'
