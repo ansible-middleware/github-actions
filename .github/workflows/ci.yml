@@ -150,6 +150,11 @@ jobs:
         with:
           path: ansible_collections/${{ inputs.fqcn }}
 
+      - name: Create default collection path
+        run: |
+          mkdir -p /home/runner/.ansible/
+          ln -s ${{ github.workspace }} /home/runner/.ansible/collections
+
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
