@@ -85,8 +85,8 @@ jobs:
 
       - name: Create default collection path
         run: |
-          mkdir -p /home/runner/.ansible/
-          ln -s ${{ github.workspace }} /home/runner/.ansible/collections
+          mkdir -p "${HOME}/.ansible"
+          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
 
       - name: Install yamllint, ansible and dependencies
         uses: nick-fields/retry@v3
@@ -101,7 +101,7 @@ jobs:
               pip install -r ansible_collections/${{ inputs.fqcn }}/requirements.txt
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p "${HOME}/.ansible/collections" --force-with-deps
             fi
 
       - name: Install ansible-lint custom rules
@@ -134,8 +134,8 @@ jobs:
 
       - name: Create default collection path
         run: |
-          mkdir -p /home/runner/.ansible/
-          ln -s ${{ github.workspace }} /home/runner/.ansible/collections
+          mkdir -p "${HOME}/.ansible"
+          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v7
@@ -208,12 +208,12 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p "${HOME}/.ansible/collections" --force-with-deps
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p "${HOME}/.ansible/collections"
             fi
             exit 0
 
@@ -246,6 +246,11 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
+      - name: Create default collection path
+        run: |
+          mkdir -p "${HOME}/.ansible"
+          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
+
       - name: Ensure podman is available
         run: |
           if ! command -v podman &> /dev/null; then
@@ -271,12 +276,12 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p "${HOME}/.ansible/collections" --force-with-deps
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p "${HOME}/.ansible/collections"
             fi
             exit 0
 
@@ -312,6 +317,11 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
+      - name: Create default collection path
+        run: |
+          mkdir -p "${HOME}/.ansible"
+          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
+
       - name: Ensure podman is available
         run: |
           if ! command -v podman &> /dev/null; then
@@ -337,12 +347,12 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p "${HOME}/.ansible/collections" --force-with-deps
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p "${HOME}/.ansible/collections"
             fi
             exit 0
 
@@ -378,6 +388,11 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
+      - name: Create default collection path
+        run: |
+          mkdir -p "${HOME}/.ansible"
+          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
+
       - name: Ensure podman is available
         run: |
           if ! command -v podman &> /dev/null; then
@@ -403,12 +418,12 @@ jobs:
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/requirements.yml ]; then
               echo "=== Installing dependencies"
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p /home/runner/.ansible/collections --force-with-deps
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/requirements.yml -p "${HOME}/.ansible/collections" --force-with-deps
             fi
             if [ -f ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ]; then
               echo "=== Installing test dependencies"
               ansible-galaxy role install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml ||:
-              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p /home/runner/.ansible/collections
+              ansible-galaxy collection install -r ansible_collections/${{ inputs.fqcn }}/molecule/requirements.yml -p "${HOME}/.ansible/collections"
             fi
             exit 0
 
