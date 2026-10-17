@@ -246,11 +246,6 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
-      - name: Create default collection path
-        run: |
-          mkdir -p "${HOME}/.ansible"
-          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
-
       - name: Ensure podman is available
         run: |
           if ! command -v podman &> /dev/null; then
@@ -317,11 +312,6 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
-      - name: Create default collection path
-        run: |
-          mkdir -p "${HOME}/.ansible"
-          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
-
       - name: Ensure podman is available
         run: |
           if ! command -v podman &> /dev/null; then
@@ -387,11 +377,6 @@ jobs:
           path: ansible_collections/${{ inputs.fqcn }}
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
-
-      - name: Create default collection path
-        run: |
-          mkdir -p "${HOME}/.ansible"
-          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
 
       - name: Ensure podman is available
         run: |

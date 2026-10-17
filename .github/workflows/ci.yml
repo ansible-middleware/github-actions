@@ -174,11 +174,6 @@ jobs:
           ref: ${{ inputs.checkout_ref || github.ref }}
           repository: ${{ inputs.checkout_repository || github.repository }}
 
-      - name: Create default collection path
-        run: |
-          mkdir -p "${HOME}/.ansible"
-          ln -sfn "${GITHUB_WORKSPACE}" "${HOME}/.ansible/collections"
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
