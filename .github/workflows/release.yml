@@ -12,6 +12,13 @@ on:
       release_summary:
         required: false
         type: string
+      version_bump:
+        description: >-
+          SemVer bump level: auto (from antsibull changelog fragments),
+          major, minor, or patch
+        required: false
+        type: string
+        default: auto
     secrets:
       galaxy_token:
         required: true
@@ -32,7 +39,7 @@ jobs:
       pages: write
       pull-requests: write
     outputs:
-      tag_version: ${{ steps.get_version.outputs.TAG_VERSION }}
+      tag_version: ${{ steps.semver.outputs.tag_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -40,26 +47,80 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.push_token || github.token }}
 
+      - name: Resolve helpers repository
+        id: helpers
+        run: |
+          # job_workflow_ref: owner/repo/.github/workflows/release.yml@ref
+          REPO=$(echo "${{ github.job_workflow_ref }}" | cut -d/ -f1-2)
+          echo "repo=${REPO}" >> "$GITHUB_OUTPUT"
+          echo "Using helpers from ${REPO}@${{ github.job_workflow_sha }}"
+
+      - name: Checkout release helpers
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.helpers.outputs.repo }}
+          ref: ${{ github.job_workflow_sha }}
+          path: .amw-gha
+          sparse-checkout: |
+            .github/scripts
+            .github/actions/semver-bump
+          sparse-checkout-cone-mode: false
+
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: 'pip'
 
-      - name: Get current version
-        id: get_version
-        run: echo "TAG_VERSION=$(grep version galaxy.yml | awk -F'"' '{ print $2 }')" >> "$GITHUB_OUTPUT"
+      - name: Validate version_bump input
+        run: |
+          case "${{ inputs.version_bump }}" in
+            auto|major|minor|patch) ;;
+            *)
+              echo "Invalid version_bump='${{ inputs.version_bump }}' (expected auto|major|minor|patch)"
+              exit 1
+              ;;
+          esac
+
+      - name: Calculate SemVer release version
+        id: semver
+        uses: ./.amw-gha/.github/actions/semver-bump
+        with:
+          version_bump: ${{ inputs.version_bump }}
+
+      - name: Preserve SemVer helper script
+        run: |
+          cp .amw-gha/.github/scripts/semver_bump.py "${{ runner.temp }}/semver_bump.py"
+          # Do not include helpers in the collection artifact
+          rm -rf .amw-gha
 
       - name: Check if tag exists
         id: check_tag
-        run: echo "TAG_EXISTS=$(git tag | grep ${{ steps.get_version.outputs.TAG_VERSION }})" >> "$GITHUB_OUTPUT"
+        run: |
+          if git tag | grep -Fxq "${{ steps.semver.outputs.tag_version }}"; then
+            echo "TAG_EXISTS=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAG_EXISTS=no" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Fail if tag exists
-        if: ${{ steps.get_version.outputs.TAG_VERSION == steps.check_tag.outputs.TAG_EXISTS }}
+        if: steps.check_tag.outputs.TAG_EXISTS == 'yes'
         uses: actions/github-script@v9
         with:
           script: |
-              core.setFailed('Release tag already exists')
+              core.setFailed('Release tag already exists: ${{ steps.semver.outputs.tag_version }}')
+
+      - name: Commit release version
+        run: |
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
+          git add galaxy.yml
+          if git diff --cached --quiet; then
+            echo "No galaxy.yml changes to commit"
+          else
+            git commit -m "Prepare release ${{ steps.semver.outputs.tag_version }}"
+            git push
+          fi
 
       - name: Install dependencies
         run: |
@@ -86,3 +147,56 @@ jobs:
           token: ${{ secrets.push_token || github.token }}
           bot_email: ansible-middleware-core@redhat.com
           bot_account: ansible-middleware-core
+
+      - name: Publish collection
+        env:
+          ANSIBLE_GALAXY_API_KEY: ${{ secrets.galaxy_token }}
+        run: |
+          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_API_KEY
+
+      - name: Create release tag
+        run: |
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
+          git tag -a ${{ steps.semver.outputs.tag_version }} -m "Release v${{ steps.semver.outputs.tag_version }}" || true
+          git push origin --tags
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.semver.outputs.tag_version }}
+          files: "*.tar.gz"
+          body_path: gh-release.md
+
+      - name: Get next development version
+        id: bump_version
+        run: |
+          NEXT_VERSION=$(python3 "${{ runner.temp }}/semver_bump.py" \
+            --next-patch "${{ steps.semver.outputs.tag_version }}")
+          echo "NEXT_VERSION=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Next development version: ${NEXT_VERSION}"
+
+      - name: Create next version in jira
+        env:
+          JIRA_WEBHOOK: ${{ secrets.jira_webhook }}
+          DOWNSTREAM_NAME: ${{ inputs.downstream_name }}
+          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+        run: |
+          if [[ ! -z "$JIRA_WEBHOOK" ]]; then
+             curl -X POST -H 'Content-type: application/json' --data '{"data": {"version":"${{ inputs.downstream_name }}-${{ steps.bump_version.outputs.NEXT_VERSION }}"}}' $JIRA_WEBHOOK
+          fi
+
+      - name: Bump version
+        env:
+          TAG_VERSION: ${{ steps.semver.outputs.tag_version }}
+          NEXT_VERSION: ${{ steps.bump_version.outputs.NEXT_VERSION }}
+        run: |
+          git config user.name ansible-middleware-core
+          git config user.email ansible-middleware-core@redhat.com
+          git checkout main || true
+          git pull || true
+          sed -i -e "s#version: \"$TAG_VERSION\"#version: \"$NEXT_VERSION\"#" galaxy.yml
+          git add galaxy.yml
+          git commit -m "Bump version to $NEXT_VERSION"
+          git push

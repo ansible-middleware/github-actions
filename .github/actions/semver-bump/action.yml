@@ -1,0 +1,47 @@
+---
+name: Calculate SemVer bump
+description: >-
+  Compute the next Ansible collection SemVer from antsibull-changelog
+  fragments (or an explicit bump level) and update galaxy.yml.
+inputs:
+  version_bump:
+    description: auto, major, minor, or patch
+    required: false
+    default: auto
+  galaxy_file:
+    description: Path to galaxy.yml
+    required: false
+    default: galaxy.yml
+  fragments_dir:
+    description: Path to changelogs/fragments
+    required: false
+    default: changelogs/fragments
+outputs:
+  tag_version:
+    description: Calculated release version
+    value: ${{ steps.calculate.outputs.TAG_VERSION }}
+  bump_level:
+    description: Bump level used (major, minor, or patch)
+    value: ${{ steps.calculate.outputs.BUMP_LEVEL }}
+  galaxy_updated:
+    description: Whether galaxy.yml was modified (true/false)
+    value: ${{ steps.calculate.outputs.galaxy_updated }}
+runs:
+  using: composite
+  steps:
+    - name: Calculate and stamp SemVer
+      id: calculate
+      shell: bash
+      run: |
+        set -euo pipefail
+        SCRIPT="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' \
+          "${{ github.action_path }}/../../scripts/semver_bump.py")"
+
+        TAG_VERSION=$(python3 "$SCRIPT" \
+          --bump "${{ inputs.version_bump }}" \
+          --galaxy "${{ inputs.galaxy_file }}" \
+          --fragments "${{ inputs.fragments_dir }}" \
+          --update-galaxy \
+          --github-output)
+
+        echo "Calculated release version: ${TAG_VERSION}"
